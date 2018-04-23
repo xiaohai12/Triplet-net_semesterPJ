@@ -1,0 +1,46 @@
+<hyper_params>
+    <loader>
+        <param name="path" type="str">./data/MNIST</param>
+        <param name="train_img" type="str">train-images.idx3-ubyte</param>
+        <param name="train_lbl" type="str">train-labels.idx1-ubyte</param>
+        <param name="test_img" type="str">t10k-images.idx3-ubyte</param>
+        <param name="test_lbl" type="str">t10k-labels.idx1-ubyte</param>
+    </loader>
+    <data_manager>
+        <param name="class_num" type="int">1000</param>
+        <param name="validate_size" type="int">1000</param>
+        <param name="channel" type="int">3</param>
+        <param name="sampling_method" type="str">channel3_1</param>
+    </data_manager>
+    <network>
+        <param name="name" type="str">triplet1</param>
+        <param name="channel" type="int">3</param>
+        <param name="height" type="int">28</param>
+        <param name="width" type="int">28</param>
+        <param name="batch_size" type="int">20</param>
+        <param name="filter_height" type="list_int">5,3,3</param>
+        <param name="filter_width" type="list_int">5,3,3</param>
+        <param name="filter_num" type="list_int">64,64,64</param>
+        <param name="pool_height" type="list_int">2,2,1</param>
+        <param name="pool_width" type="list_int">2,2,1</param>
+        <param name="local_fc_neuron_num" type="list_int">200,50</param>
+        <param name="loss_type" type="str">mlp</param>
+        <param name="max_gradient_norm" type="float">0.5</param>
+        <update_policy>
+            <param name="name" type="str">adam</param>
+            <param name="learning_rate" type="float">0.001</param>
+            <param name="momentum" type="float">0.9</param>
+            <param name="initial_accumulator_value" type="float"></param>
+            <param name="rho" type="float"></param>
+            <param name="epsilon" type="float">1e-8</param>
+            <param name="decay" type="float"></param>
+            <param name="beta1" type="float">0.9</param>
+            <param name="beta2" type="float">0.999</param>
+        </update_policy>
+        <param name="global_fc_neuron_num" type="list_int">50</param>
+    </network>
+    <feature_extraction_params>
+        <param name="batches" type="int">200</param>
+        <param name="model2load" type="str">model_saved/triplet1_85000.ckpt</param>
+    </feature_extraction_params>
+</hyper_params>
