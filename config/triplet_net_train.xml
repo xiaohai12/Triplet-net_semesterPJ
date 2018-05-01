@@ -1,10 +1,9 @@
 <hyper_params>
     <loader>
-        <param name="path" type="str">./data/MNIST</param>
-        <param name="train_img" type="str">train-images.idx3-ubyte</param>
-        <param name="train_lbl" type="str">train-labels.idx1-ubyte</param>
-        <param name="test_img" type="str">t10k-images.idx3-ubyte</param>
-        <param name="test_lbl" type="str">t10k-labels.idx1-ubyte</param>
+        <param name="path" type="str">./data/SVHN</param>
+        <param name="train_data" type="str">train_32x32.mat</param>
+        <param name="test_data" type="str">test_32x32.mat</param>
+
     </loader>
     <data_manager>
         <param name="class_num" type="int">10</param>
@@ -15,19 +14,20 @@
     <network>
         <param name="name" type="str">triplet1</param>
         <param name="channel" type="int">3</param>
-        <param name="height" type="int">28</param>
-        <param name="width" type="int">28</param>
+        <param name="height" type="int">32</param>
+        <param name="width" type="int">32</param>
         <param name="batch_size" type="int">20</param>
-        <param name="filter_height" type="list_int">5,3,3</param>
-        <param name="filter_width" type="list_int">5,3,3</param>
-        <param name="filter_num" type="list_int">64,64,64</param>
-        <param name="pool_height" type="list_int">2,2,1</param>
-        <param name="pool_width" type="list_int">2,2,1</param>
-        <param name="local_fc_neuron_num" type="list_int">200,50</param>
+        <param name="filter_height" type="list_int">5,5,5,5,5,5,5,5</param>
+        <param name="filter_width" type="list_int">5,5,5,5,5,5,5,5</param>
+        <param name="filter_num" type="list_int">48,64,128,160,192,192,192,192</param>
+        <param name="pool_height" type="list_int">2,2,2,2,2,2,2,2,2</param>
+        <param name="pool_width" type="list_int">2,2,2,2,2,2,2,2,2</param>
+        <param name="pool_strides" type="list_int">2,1,2,1,2,1,2,1</param>
+        <param name="local_fc_neuron_num" type="list_int">3072,3072,7,11,11,11,11,11</param>
         <param name="loss_type" type="str">mlp</param>
         <param name="max_gradient_norm" type="float">0.5</param>
         <update_policy>
-            <param name="name" type="str">adam</param>
+            <param name="name" type="str">Adam</param>
             <param name="learning_rate" type="float">0.001 </param>
             <param name="momentum" type="float">0.9</param>
             <param name="initial_accumulator_value" type="float"></param>
@@ -40,7 +40,7 @@
         <param name="global_fc_neuron_num" type="list_int">50</param>
     </network>
     <train>
-        <param name="batches" type="int">100000</param>
+        <param name="batches" type="int">30000</param>
         <param name="check_err_frequency" type="int">100</param>
         <param name="validate_frequency" type="int">1000</param>
         <param name="validate_batches" type="int">1000</param>

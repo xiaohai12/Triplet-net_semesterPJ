@@ -1,13 +1,11 @@
 <hyper_params>
     <loader>
-        <param name="path" type="str">./data/MNIST</param>
-        <param name="train_img" type="str">train-images.idx3-ubyte</param>
-        <param name="train_lbl" type="str">train-labels.idx1-ubyte</param>
-        <param name="test_img" type="str">t10k-images.idx3-ubyte</param>
-        <param name="test_lbl" type="str">t10k-labels.idx1-ubyte</param>
+        <param name="path" type="str">./data/SVHN</param>
+        <param name="train_data" type="str">train_32x32.mat</param>
+        <param name="test_data" type="str">test_32x32.mat</param>
     </loader>
     <data_manager>
-        <param name="class_num" type="int">1000</param>
+        <param name="class_num" type="int">10</param>
         <param name="validate_size" type="int">1000</param>
         <param name="channel" type="int">3</param>
         <param name="sampling_method" type="str">channel3_1</param>
@@ -15,8 +13,8 @@
     <network>
         <param name="name" type="str">triplet1</param>
         <param name="channel" type="int">3</param>
-        <param name="height" type="int">28</param>
-        <param name="width" type="int">28</param>
+        <param name="height" type="int">32</param>
+        <param name="width" type="int">32</param>
         <param name="batch_size" type="int">20</param>
         <param name="filter_height" type="list_int">5,3,3</param>
         <param name="filter_width" type="list_int">5,3,3</param>

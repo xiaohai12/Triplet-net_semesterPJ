@@ -1,6 +1,9 @@
+import math
+
 import tensorflow as tf
 import numpy as np
 import sklearn;
+import tensorflow.contrib.slim as slim
 
 class triplet_net(object):
 
@@ -17,6 +20,7 @@ class triplet_net(object):
         filter_width=hyper_params['filter_width']
         pool_height=hyper_params['pool_height']
         pool_width=hyper_params['pool_width']
+        self.pool_strides = hyper_params['pool_strides']
         filter_num=hyper_params['filter_num']
         self.conv_layer_num=np.min([len(filter_height),len(filter_width),len(filter_num),len(pool_height),len(pool_width)])
         self.filter_size=zip(filter_height[:self.conv_layer_num],filter_width[:self.conv_layer_num])
@@ -70,7 +74,9 @@ class triplet_net(object):
                 input_dimension=self.global_fc_neuron_num[-1]
                 output_dimension=2
                 W=tf.get_variable(name='W',shape=[input_dimension,output_dimension],
-                    initializer=tf.truncated_normal_initializer(stddev=0.2))
+                    initializer=tf.contrib.layers.xavier_initializer())
+
+
                     #initial the weight w and noise b
                 b=tf.get_variable(name='b',shape=[output_dimension],
                     initializer=tf.truncated_normal_initializer(stddev=0.2))
@@ -135,6 +141,14 @@ class triplet_net(object):
 
         print('Triplet Neural Network Constructed!!')
 
+    def get_pretrain_weight(self):
+        pre_trained_weights = np.load("....")
+        pre_trained_weights =
+        my_non_trainable = tf.get_variable("my_non_trainable",
+                                           shape=(),
+                                           trainable=False)
+
+
     def feature_extractor(self, input_data, reuse=False):
         # '''
         # >>> feature extractor
@@ -149,12 +163,18 @@ class triplet_net(object):
             with tf.variable_scope('cnn',reuse=reuse):
                 for conv_idx in xrange(self.conv_layer_num):
                     W=tf.get_variable(name='W%d'%(conv_idx+1),shape=[self.filter_size[conv_idx][0],self.filter_size[conv_idx][1],input_feature_num[conv_idx],output_feature_num[conv_idx]],
-                        initializer=tf.truncated_normal_initializer(stddev=0.2))
-                    conv_output=tf.nn.conv2d(input_data,W,strides=[1,1,1,1],padding='VALID')
-                    pool_output=tf.nn.max_pool(conv_output,ksize=[1,self.pool_size[conv_idx][0],self.pool_size[conv_idx][1],1],
-                        strides=[1,self.pool_size[conv_idx][0],self.pool_size[conv_idx][1],1],padding='VALID')
-                    input_data=tf.nn.relu(pool_output)          # output is the input of next layer
-                    image_size=[(image_size[dim_idx]-self.filter_size[conv_idx][dim_idx]+1)/self.pool_size[conv_idx][dim_idx] for dim_idx in xrange(2)]
+                                      initializer=tf.contrib.layers.xavier_initializer())
+
+                    conv_output=tf.nn.conv2d(input_data,W,strides=[1,1,1,1],padding='SAME')
+                    norm = tf.layers.batch_normalization(conv_output)
+                    activation = tf.nn.relu(norm)
+                    pool_output = tf.nn.max_pool(activation,
+                                                 ksize=[1, self.pool_size[conv_idx][0], self.pool_size[conv_idx][1], 1],
+                                                 strides=[1, self.pool_strides[conv_idx], self.pool_strides,
+                                                          1], padding='SAME')
+
+                    input_data = pool_output
+                    image_size=[(image_size[dim_idx])/self.pool_size[conv_idx][dim_idx] for dim_idx in xrange(2)]
             image_vec_size=output_feature_num[-1]*np.prod(image_size)
             input_data=tf.reshape(input_data,shape=[self.batch_size,image_vec_size])
             input_neuron_num=[image_vec_size,]+self.local_fc_neuron_num[:-1]
@@ -162,12 +182,13 @@ class triplet_net(object):
             with tf.variable_scope('mlp',reuse=reuse):
                 for mlp_idx in xrange(self.local_fc_layer_num):
                     W=tf.get_variable(name='W%d'%(mlp_idx+1),shape=[input_neuron_num[mlp_idx],output_neuron_num[mlp_idx]],
-                        initializer=tf.truncated_normal_initializer(stddev=0.2))
+                                      initializer=tf.contrib.layers.xavier_initializer())
+
                     b=tf.get_variable(name='b%d'%(mlp_idx+1),shape=[output_neuron_num[mlp_idx],],
                         initializer=tf.truncated_normal_initializer(stddev=0.2))
                     ##add batch_normalization
                     x = tf.layers.batch_normalization(tf.add(tf.matmul(input_data,W),b))
-                    input_data=tf.nn.relu(x)
+                    input_data=tf.layers.dropout(tf.nn.relu(x), rate=0.25)
                     #input_data = tf.nn.relu(tf.add(tf.matmul(input_data, W), b))
         return input_data
 
@@ -182,12 +203,13 @@ class triplet_net(object):
             with tf.variable_scope('mlp',reuse=reuse):
                 for mlp_idx in xrange(self.global_fc_layer_num):
                     W=tf.get_variable(name='W%d'%(mlp_idx+1),shape=[input_neuron_num[mlp_idx],output_neuron_num[mlp_idx]],
-                        initializer=tf.truncated_normal_initializer(stddev=0.2))
+                        initializer=tf.contrib.layers.xavier_initializer())
+
                     b=tf.get_variable(name='b%d'%(mlp_idx+1),shape=[output_neuron_num[mlp_idx],],
                         initializer=tf.truncated_normal_initializer(stddev=0.2))
                     ##add batch_normalization
                     x = tf.layers.batch_normalization(tf.add(tf.matmul(input_data, W), b))
-                    input_data = tf.nn.relu(x)
+                    input_data =tf.layers.dropout(tf.nn.relu(x), rate=0.25)
                     #input_data=tf.nn.relu(tf.add(tf.matmul(input_data,W),b))
         return input_data
 
@@ -216,6 +238,10 @@ class triplet_net(object):
     #     input_dict={self.image_r:data_r, self.image_1:data_1, self.image_2:data_2}
     #     value,=self.sess.run([self.unnormalized_prediciton],feed_dict=input_dict)
     #     return value
+
+
+    ##def diversgence_loss(self,prediction,labels):
+
 
     def train(self, data_r, data_1, data_2, data_label,learning_rate):
         data_r=np.array(data_r).reshape([self.batch_size,self.height,self.width,self.channel])

@@ -5,7 +5,6 @@ import sys
 
 import numpy as np
 import sklearn.metrics
-
 if sys.version_info.major==2:
     input=raw_input
 elif sys.version_info.major==3:
@@ -33,8 +32,7 @@ hyper_params=xml_parser.parse(sys.argv[1],flat=False)
 #print(sys.argv[1])
 # Construct the loader
 loader_params=hyper_params['loader']
-my_loader=loader.loader(path=loader_params['path'],train_img=loader_params['train_img'],
-    train_lbl=loader_params['train_lbl'],test_img=loader_params['test_img'],test_lbl=loader_params['test_lbl'])
+my_loader=loader.loader(path=loader_params['path'],train=loader_params['train_data'],test=loader_params['test_data'])
 
 # Construct the data manager
 data_manager_params=hyper_params['data_manager']
@@ -100,8 +98,8 @@ Total_loss=[]
 batch_list = []
 train_plot_loss = []
 count = 0
-learning_rate = 0.001
-learning_rate_temp = 0.001
+learning_rate = 0.0001
+learning_rate_temp = 0.0001
 if model2load!=None and os.path.exists(model2load):
     my_network.load_params(file2dump=model2load)
 for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
@@ -133,6 +131,7 @@ for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
 
         for validate_batch_idx in xrange(validate_batches):
             data_r,data_1,data_2,data_label=my_data_manager.get_triplet_ranked_instance('validate',batch_size,method,dual=False)
+
             prediction,loss=my_network.validate(data_r,data_1,data_2,data_label,learning_rate)
             reshape_prediction = prediction[:, 0]
             Total_label_val = np.append(Total_label_val, data_label)
@@ -164,3 +163,12 @@ plt.plot(batch_list[4:],train_plot_loss[4:])
 plt.title("learning curve")
 plt.show()
 my_network.train_validate_test_end()
+# import matplotlib.pyplot as plt
+# from scipy.io import loadmat
+# import cv2
+# data = loadmat("./data/SVHN/train_32x32.mat")
+# data_train = data['X']
+# image = data_train[:,:,:,2]
+# print data['y'][2]
+# plt.imshow(image)
+# plt.show()
