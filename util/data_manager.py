@@ -89,192 +89,31 @@ class data_manager(object):
 
         image_idx=0
         while image_idx<number:
-            if(method=='channel1'):
-                majority_category = random.randint(0, self.class_num - 1)
+            majority_category = random.randint(0, self.class_num - 1)
+            minority_category = random.randint(0, self.class_num - 1)
+            while majority_category == minority_category:
                 minority_category = random.randint(0, self.class_num - 1)
-                while majority_category == minority_category:
-                    minority_category = random.randint(0, self.class_num - 1)
 
-                majority_list = list_by_label[majority_category]
-                minority_list = list_by_label[minority_category]
+            majority_list = list_by_label[majority_category]
+            minority_list = list_by_label[minority_category]
 
-                instance_r = majority_list[random.randint(0, len(majority_list) - 1)]
-                instance_1 = majority_list[random.randint(0, len(majority_list) - 1)]
-                instance_2 = minority_list[random.randint(0, len(minority_list) - 1)]
+            instance_r = majority_list[random.randint(0, len(majority_list) - 1)]
+            instance_1 = majority_list[random.randint(0, len(majority_list) - 1)]
+            instance_2 = minority_list[random.randint(0, len(minority_list) - 1)]
 
-                label[image_idx] = random.randint(0, 1)
+            label[image_idx] = random.randint(0, 1)
+            image_r[image_idx] = instance_r
+            image_1[image_idx] = instance_1 if label[image_idx] == 0 else instance_2
+            image_2[image_idx] = instance_2 if label[image_idx] == 0 else instance_1
+
+            image_idx += 1
+
+            if dual == True and image_idx < number:
+                label[image_idx] = 1 - label[image_idx - 1]
                 image_r[image_idx] = instance_r
-                image_1[image_idx] = instance_1 if label[image_idx] == 0 else instance_2
-                image_2[image_idx] = instance_2 if label[image_idx] == 0 else instance_1
-
+                image_1[image_idx] = image_2[image_idx - 1]
+                image_2[image_idx] = image_1[image_idx - 1]
                 image_idx += 1
-
-                if dual == True and image_idx < number:
-                    label[image_idx] = 1 - label[image_idx - 1]
-                    image_r[image_idx] = instance_r
-                    image_1[image_idx] = image_2[image_idx - 1]
-                    image_2[image_idx] = image_1[image_idx - 1]
-                    image_idx += 1
-
-            elif (method == 'channel2_1'):
-                majority_category=random.randint(0,self.class_num-1)
-                majority_category2 = random.randint(0,self.class_num-1)
-                minority_category=random.randint(0,self.class_num-1)
-                minority_category2 = random.randint(0,self.class_num-1)
-
-                while ((majority_category==minority_category) and (majority_category2==minority_category2)):
-                    minority_category=random.randint(0,self.class_num-1)
-                    minority_category2 = random.randint(0, self.class_num - 1)
-
-                majority_list=list_by_label[majority_category]#majority_list include one class image
-                minority_list=list_by_label[minority_category]
-                majority_list2 = list_by_label[majority_category2]
-                minority_list2 = list_by_label[minority_category2]
-
-
-                instance_r1=majority_list[random.randint(0,len(majority_list)-1)]
-                instance_r2 = majority_list2[random.randint(0,len(majority_list2)-1)]
-                instance_11=majority_list[random.randint(0,len(majority_list)-1)]
-                instance_12 = majority_list2[random.randint(0,len(majority_list2)-1)]
-                instance_21=minority_list[random.randint(0,len(minority_list)-1)]
-                instance_22 = minority_list2[random.randint(0,len(minority_list2)-1)]
-
-                label[image_idx]=random.randint(0,1)
-                image_r[image_idx,0]=instance_r1
-                image_r[image_idx,1]=instance_r2
-                if label[image_idx] == 0:
-                    image_1[image_idx,0]=instance_11
-                    image_1[image_idx,1]=instance_12
-                    image_2[image_idx,0]=instance_21
-                    image_2[image_idx,1]=instance_22
-                else:
-                    image_1[image_idx, 0] = instance_21
-                    image_1[image_idx, 1] = instance_22
-                    image_2[image_idx, 0] = instance_11
-                    image_2[image_idx, 1] = instance_12
-
-                image_idx+=1
-
-                if dual==True and image_idx<number:
-                    label[image_idx]=1-label[image_idx-1]
-                    image_r[image_idx,0]=instance_r1
-                    image_r[image_idx,1]=instance_r2
-                    image_1[image_idx]=image_2[image_idx-1]
-                    image_2[image_idx]=image_1[image_idx-1]
-                    image_idx+=1
-
-            elif (method == 'channel2_2'):
-
-                majority_category=random.randint(0,self.class_num-1)
-                majority_category2=random.randint(0,self.class_num-1)
-                rd_category = random.randint(0,self.class_num-1)
-                minority_category=random.randint(0,self.class_num-1)
-                minority_category2 = random.randint(0,self.class_num-1)
-
-                while ((majority_category==minority_category) and (majority_category2==minority_category2)):
-                    minority_category=random.randint(0,self.class_num-1)
-                    minority_category2 = random.randint(0, self.class_num - 1)
-
-                majority_list=list_by_label[majority_category]#majority_list include one class image
-                minority_list=list_by_label[minority_category]
-                majority_list2 = list_by_label[majority_category2]
-                minority_list2 = list_by_label[minority_category2]
-                rd_list = list_by_label[rd_category]
-
-                instance_r1=majority_list[random.randint(0,len(majority_list)-1)]
-                instance_r2 = majority_list2[random.randint(0,len(majority_list2)-1)]
-                state = random.randint(0,1)
-                if state==1:
-                    instance_11=majority_list[random.randint(0,len(majority_list)-1)]
-                    instance_12 = rd_list[random.randint(0,len(rd_list)-1)]
-                else:
-                    instance_12 = majority_list[random.randint(0, len(majority_list) - 1)]
-                    instance_11 = rd_list[random.randint(0, len(rd_list) - 1)]
-                instance_21=minority_list[random.randint(0,len(minority_list)-1)]
-                instance_22 = minority_list2[random.randint(0,len(minority_list2)-1)]
-
-                label[image_idx]=random.randint(0,1)
-                image_r[image_idx,0]=instance_r1
-                image_r[image_idx,1]=instance_r2
-                if label[image_idx] == 0:
-                    image_1[image_idx,0]=instance_11
-                    image_1[image_idx,1]=instance_12
-                    image_2[image_idx,0]=instance_21
-                    image_2[image_idx,1]=instance_22
-                else:
-                    image_1[image_idx, 0] = instance_21
-                    image_1[image_idx, 1] = instance_22
-                    image_2[image_idx, 0] = instance_11
-                    image_2[image_idx, 1] = instance_12
-
-                image_idx+=1
-                if dual==True and image_idx<number:
-                    label[image_idx]=1-label[image_idx-1]
-                    image_r[image_idx,0]=instance_r1
-                    image_r[image_idx,1]=instance_r2
-                    image_1[image_idx]=image_2[image_idx-1]
-                    image_2[image_idx]=image_1[image_idx-1]
-                    image_idx+=1
-
-            elif (method == 'channel3_1'):
-
-                majority_category=random.randint(0,self.class_num-1)
-                majority_category2=random.randint(0,self.class_num-1)
-                majority_category3 = random.randint(0, self.class_num - 1)
-                minority_category=random.randint(0,self.class_num-1)
-                minority_category2 = random.randint(0,self.class_num-1)
-                minority_category3 = random.randint(0, self.class_num - 1)
-
-                while ((majority_category==minority_category) and (majority_category2==minority_category2) and (majority_category3==minority_category3)):
-                    minority_category=random.randint(0,self.class_num-1)
-                    minority_category2 = random.randint(0, self.class_num - 1)
-
-                majority_list=list_by_label[majority_category]#majority_list include one class image
-                minority_list=list_by_label[minority_category]
-                majority_list2 = list_by_label[majority_category2]
-                minority_list2 = list_by_label[minority_category2]
-                majority_list3 = list_by_label[majority_category3]
-                minority_list3 = list_by_label[minority_category3]
-
-                instance_r1=majority_list[random.randint(0,len(majority_list)-1)]
-                instance_r2 = majority_list2[random.randint(0,len(majority_list2)-1)]
-                instance_r3 = majority_list3[random.randint(0,len(majority_list3)-1)]
-
-                instance_11 = majority_list[random.randint(0,len(majority_list)-1)]
-                instance_12 = majority_list2[random.randint(0,len(majority_list2)-1)]
-                instance_13 = majority_list3[random.randint(0,len(majority_list3)-1)]
-
-                instance_21=minority_list[random.randint(0,len(minority_list)-1)]
-                instance_22 = minority_list2[random.randint(0,len(minority_list2)-1)]
-                instance_23 = minority_list3[random.randint(0, len(minority_list3) - 1)]
-
-                label[image_idx]=random.randint(0,1)
-                image_r[image_idx,0]=instance_r1
-                image_r[image_idx,1]=instance_r2
-                if label[image_idx] == 0:
-                    image_1[image_idx,0]=instance_11
-                    image_1[image_idx,1]=instance_12
-                    image_1[image_idx,2] = instance_13
-                    image_2[image_idx,0]=instance_21
-                    image_2[image_idx,1]=instance_22
-                    image_2[image_idx,2] = instance_23
-                else:
-                    image_1[image_idx, 0] = instance_21
-                    image_1[image_idx, 1] = instance_22
-                    image_1[image_idx, 2] = instance_23
-                    image_2[image_idx, 0] = instance_11
-                    image_2[image_idx, 1] = instance_12
-                    image_2[image_idx, 2] = instance_13
-
-                image_idx+=1
-                if dual==True and image_idx<number:
-                    label[image_idx]=1-label[image_idx-1]
-                    image_r[image_idx,0]=instance_r1
-                    image_r[image_idx,1]=instance_r2
-                    image_1[image_idx]=image_2[image_idx-1]
-                    image_2[image_idx]=image_1[image_idx-1]
-                    image_idx+=1
-
 
         permutation_idx=np.random.permutation(np.arange(number))
         image_r=image_r[permutation_idx]

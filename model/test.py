@@ -227,3 +227,11 @@
 # A = [1,2,3,3,5,6,7]
 # p = 3.5
 # print(find(A,p))
+import matplotlib.pyplot as plt
+from scipy.io import loadmat
+import cv2
+data = loadmat("./data/SVHN/train_32x32.mat")
+data_train = data['X']
+image = data_train[:,:,:,1]
+plt.imshow(image)
+plt.show()

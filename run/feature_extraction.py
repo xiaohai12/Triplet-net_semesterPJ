@@ -22,8 +22,7 @@ hyper_params=xml_parser.parse(sys.argv[1],flat=False)
 
 # Construct the loader
 loader_params=hyper_params['loader']
-my_loader=loader.loader(path=loader_params['path'],train_img=loader_params['train_img'],
-    train_lbl=loader_params['train_lbl'],test_img=loader_params['test_img'],test_lbl=loader_params['test_lbl'])
+my_loader=loader.loader(path=loader_params['path'],train=loader_params['train_data'],test=loader_params['test_data'])
 print('loader constructed')
 
 # Construct the data manager

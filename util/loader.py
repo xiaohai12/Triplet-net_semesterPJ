@@ -4,17 +4,16 @@ import random
 import struct
 import numpy as np
 from array import array
+from scipy.io import loadmat
+from keras.datasets import cifar10
 
 class loader(object):
 
         #ubyte is type for minist image.
 
-    def __init__(self,path,train_img='train-images.idx3-ubyte',train_lbl='train-labels.idx1-ubyte',
-        test_img='t10k-images.idx3-ubyte',test_lbl='t10k-labels.idx1-ubyte'):
-        self.train_img_file=os.path.join(path, train_img)
-        self.train_lbl_file=os.path.join(path, train_lbl)
-        self.test_img_file=os.path.join(path, test_img)
-        self.test_lbl_file=os.path.join(path, test_lbl)
+    def __init__(self,path,train='train_32x32.mat',test='test_32x32.mat'):
+        self.train_file=os.path.join(path, train)
+        self.test_file=os.path.join(path, test)
 
         self.image_size=None
 
@@ -26,17 +25,19 @@ class loader(object):
         self.test_label_list=[]
 
     def load_train_set(self):
-        images,labels=self.load(self.train_img_file,self.train_lbl_file)
-        self.train_image_list=images
-        self.train_label_list=labels
-        assert(len(self.train_image_list)==len(self.train_label_list))
+        images,labels=self.load("train")
+        Shape = images.shape
+        self.train_image_list = np.reshape(images,(-1,Shape[3],Shape[1],Shape[2]))
+        self.train_label_list=np.reshape(labels,(len(labels),))-1
+        #assert(len(self.train_image_list)==len(self.train_label_list))
         print 'there are %d training instances'%len(self.train_label_list)
 
     def load_test_set(self):
-        images,labels=self.load(self.test_img_file,self.test_lbl_file)
-        self.test_image_list=images
-        self.test_label_list=labels
-        assert(len(self.test_image_list)==len(self.test_label_list))
+        images,labels=self.load("test")
+        Shape = images.shape
+        self.test_image_list=np.reshape(images,(-1,Shape[3],Shape[1],Shape[2]))
+        self.test_label_list=np.reshape(labels,(len(labels),))-1
+        #assert(len(self.test_image_list)==len(self.test_label_list))
         print 'there are %d testing instances'%len(self.test_label_list)
 
     def reserve_validation_set(self,prop):
@@ -62,30 +63,19 @@ class loader(object):
         self.train_image_list=self.train_image_list[train_idx_list]
         self.train_label_list=self.train_label_list[train_idx_list]
 
-    def load(self,img_file,lbl_file):
-        with open(img_file,'rb') as fopen:
-            magic,size,rows,columns=struct.unpack('>IIII',fopen.read(16))
-            if magic!=2051:
-                raise ValueError('Magic number mismatch, 2051 expected, %d got'%magic)
-            image_data=array('B',fopen.read())
 
-        with open(lbl_file,'rb') as fopen:
-            magic,size=struct.unpack('>II',fopen.read(8))
-            if magic!=2049:
-                raise ValueError('Magic number mismatch, 2049 expected, %d got'%magic)
-            labels=array('B',fopen.read())
-
-        if self.image_size==None:
-            self.image_size=[rows,columns]
-        assert(self.image_size==[rows,columns])
-
-        images=[]
-        for idx in xrange(size):
-            image_matrix=np.array(image_data[idx*columns*rows:(idx+1)*columns*rows]).reshape([rows,columns])
-            images.append(image_matrix)
-
-        images=np.array(images).astype(np.float32)/256.			# Normalization
-        labels=np.array(labels).astype(np.int)
+    def load(self,method):
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        if method=="train":
+            images,labels = x_train,y_train
+            self.image_size = [images.shape[1],images.shape[2]]
+            images=np.array(images).astype(np.float32)/256.			# Normalization
+            labels=np.array(labels).astype(np.int)
+        elif method =="test":
+            images, labels = x_test, y_test
+            self.image_size = [images.shape[1], images.shape[2]]
+            images = np.array(images).astype(np.float32) / 256.  # Normalization
+            labels = np.array(labels).astype(np.int)
 
         return images,labels
 
