@@ -22,8 +22,7 @@ hyper_params=xml_parser.parse(sys.argv[1],flat=False)
 
 # Construct the loader
 loader_params=hyper_params['loader']
-my_loader=loader.loader(path=loader_params['path'],train_img=loader_params['train_img'],
-    train_lbl=loader_params['train_lbl'],test_img=loader_params['test_img'],test_lbl=loader_params['test_lbl'])
+my_loader=loader.loader()
 print('loader constructed')
 
 # Construct the data manager
@@ -115,15 +114,15 @@ def get_color_list(number):
 color_list=get_color_list(class_num)
 fig_handlers=[]
 fig_labels=[]
-
+Label_list = ["airplane","automobile","bird","cat","deer","dog","frog","horse","ship","truck"]
 for idx,feature_matrix in enumerate(projected_feature_by_label):
     feature_matrix=np.array(feature_matrix)
     if feature_matrix ==[]:
         continue
     handler=plt.scatter(feature_matrix[:,0],feature_matrix[:,1],color=color_list[idx])
     fig_handlers.append(handler)
-    fig_labels.append(str(idx))
-
+    Label = Label_list[idx]
+    fig_labels.append(Label)
 plt.legend(fig_handlers,fig_labels,scatterpoints=1)
 plt.title("Embedding picture")
 plt.show()

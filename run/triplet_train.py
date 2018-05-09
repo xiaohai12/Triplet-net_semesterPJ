@@ -33,8 +33,7 @@ hyper_params=xml_parser.parse(sys.argv[1],flat=False)
 #print(sys.argv[1])
 # Construct the loader
 loader_params=hyper_params['loader']
-my_loader=loader.loader(path=loader_params['path'],train_img=loader_params['train_img'],
-    train_lbl=loader_params['train_lbl'],test_img=loader_params['test_img'],test_lbl=loader_params['test_lbl'])
+my_loader=loader.loader()
 
 # Construct the data manager
 data_manager_params=hyper_params['data_manager']
@@ -100,8 +99,8 @@ Total_loss=[]
 batch_list = []
 train_plot_loss = []
 count = 0
-learning_rate = 0.001
-learning_rate_temp = 0.001
+learning_rate = 0.01
+learning_rate_temp = 0.01
 if model2load!=None and os.path.exists(model2load):
     my_network.load_params(file2dump=model2load)
 for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):

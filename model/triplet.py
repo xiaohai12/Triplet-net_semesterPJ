@@ -70,7 +70,7 @@ class triplet_net(object):
                 input_dimension=self.global_fc_neuron_num[-1]
                 output_dimension=2
                 W=tf.get_variable(name='W',shape=[input_dimension,output_dimension],
-                    initializer=tf.truncated_normal_initializer(stddev=0.2))
+                    initializer=tf.contrib.layers.xavier_initializer())
                     #initial the weight w and noise b
                 b=tf.get_variable(name='b',shape=[output_dimension],
                     initializer=tf.truncated_normal_initializer(stddev=0.2))
@@ -162,7 +162,7 @@ class triplet_net(object):
             with tf.variable_scope('mlp',reuse=reuse):
                 for mlp_idx in xrange(self.local_fc_layer_num):
                     W=tf.get_variable(name='W%d'%(mlp_idx+1),shape=[input_neuron_num[mlp_idx],output_neuron_num[mlp_idx]],
-                        initializer=tf.truncated_normal_initializer(stddev=0.2))
+                        initializer=tf.contrib.layers.xavier_initializer_conv2d())
                     b=tf.get_variable(name='b%d'%(mlp_idx+1),shape=[output_neuron_num[mlp_idx],],
                         initializer=tf.truncated_normal_initializer(stddev=0.2))
                     ##add batch_normalization
@@ -182,7 +182,7 @@ class triplet_net(object):
             with tf.variable_scope('mlp',reuse=reuse):
                 for mlp_idx in xrange(self.global_fc_layer_num):
                     W=tf.get_variable(name='W%d'%(mlp_idx+1),shape=[input_neuron_num[mlp_idx],output_neuron_num[mlp_idx]],
-                        initializer=tf.truncated_normal_initializer(stddev=0.2))
+                        initializer=tf.contrib.layers.xavier_initializer())
                     b=tf.get_variable(name='b%d'%(mlp_idx+1),shape=[output_neuron_num[mlp_idx],],
                         initializer=tf.truncated_normal_initializer(stddev=0.2))
                     ##add batch_normalization
