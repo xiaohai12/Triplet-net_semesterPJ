@@ -33,8 +33,7 @@ hyper_params=xml_parser.parse(sys.argv[1],flat=False)
 #print(sys.argv[1])
 # Construct the loader
 loader_params=hyper_params['loader']
-my_loader=loader.loader(path=loader_params['path'],train_img=loader_params['train_img'],
-    train_lbl=loader_params['train_lbl'],test_img=loader_params['test_img'],test_lbl=loader_params['test_lbl'])
+my_loader=loader.loader()
 
 # Construct the data manager
 data_manager_params=hyper_params['data_manager']
@@ -100,27 +99,83 @@ Total_loss=[]
 batch_list = []
 train_plot_loss = []
 count = 0
-learning_rate = 0.001
-learning_rate_temp = 0.001
+learning_rate = 0.0001
+learning_rate_temp = 0.0001
 if model2load!=None and os.path.exists(model2load):
     my_network.load_params(file2dump=model2load)
+# for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
+#
+#     data_r,data_1,data_2,data_label=my_data_manager.get_triplet_ranked_instance('train',batch_size,method,dual=False)
+#     ##normalization:
+#
+#
+#     prediction, loss=my_network.train(data_r,data_1,data_2,data_label,learning_rate)
+#     reshape_prediction = prediction[:,0]
+#     training_loss.append(loss)
+#
+#     Total_label = np.append(Total_label, data_label)
+#     Total_pre = np.append(Total_pre, reshape_prediction)
+#     sys.stdout.write('batch_idx=%d/%d, loss=%.4f \r'%(batch_idx+1,batches,loss))
+#
+#     if (batch_idx+1)%check_err_frequency==0:
+#
+#         print('batch=[%d,%d), average=%.4f'%(batch_idx+1-check_err_frequency, batch_idx+1, np.mean(training_loss[-check_err_frequency:])))
+#         batch_list.append(batch_idx)
+#         train_plot_loss.append(np.mean(training_loss[-check_err_frequency:]))
+#     if (batch_idx+1)%validate_frequency==0:
+#         my_network.dump_params(file2dump=model_saved_folder+os.sep+'%s_%d.ckpt'%(my_network.name,batch_idx+1))
+#
+#         validate_loss=[]
+#         Total_label_val = []
+#         Total_pre_val = []
+#         print(learning_rate)
+#
+#         for validate_batch_idx in xrange(validate_batches):
+#             data_r,data_1,data_2,data_label=my_data_manager.get_triplet_ranked_instance('validate',batch_size,method,dual=False)
+#             loss=my_network.validate(data_r,data_1,data_2,data_label,learning_rate)
+#             reshape_prediction = prediction[:, 0]
+#             Total_label_val = np.append(Total_label_val, data_label)
+#             Total_pre_val = np.append(Total_pre_val, reshape_prediction)
+#             NMI = sklearn.metrics.normalized_mutual_info_score(Total_label_val, Total_pre_val)
+#             validate_loss.append(loss)
+#
+#             sys.stdout.write('Validation: batch_idx=%d/%d, loss=%.4f, avg_loss=%.4f \r'%(validate_batch_idx+1, validate_batches, loss, np.mean(validate_loss)))
+#         if np.mean(validate_loss)<validate_min_error:
+#             validate_min_error=np.mean(validate_loss)
+#             validate_best_pt=batch_idx+1
+#             count = 0
+#             #learning_rate = 0.001
+#
+#         else:
+#             count +=1
+#             if count==20:
+#                 learning_rate = learning_rate/2
+#                 count = 0
+#                 if learning_rate==learning_rate_temp/256:
+#                     learning_rate = learning_rate*2
+#                     learning_rate_temp = learning_rate
+#
+#         print('')
+
+
+
+##------------------------------divergence----------------------------##
 for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
 
     data_r,data_1,data_2,data_label=my_data_manager.get_triplet_ranked_instance('train',batch_size,method,dual=False)
     ##normalization:
 
 
-    prediction, loss=my_network.train(data_r,data_1,data_2,data_label,learning_rate)
-    reshape_prediction = prediction[:,0]
+    loss=my_network.train(data_r,data_1,data_2,data_label,learning_rate)[0]
+
     training_loss.append(loss)
 
-    Total_label = np.append(Total_label, data_label)
-    Total_pre = np.append(Total_pre, reshape_prediction)
+
     sys.stdout.write('batch_idx=%d/%d, loss=%.4f \r'%(batch_idx+1,batches,loss))
 
     if (batch_idx+1)%check_err_frequency==0:
 
-        print('batch=[%d,%d), average=%.4f'%(batch_idx+1-check_err_frequency, batch_idx+1, np.mean(training_loss[-check_err_frequency:])))
+        print('batch=[%d,%d), average=%.6f'%(batch_idx+1-check_err_frequency, batch_idx+1, np.mean(training_loss[-check_err_frequency:])))
         batch_list.append(batch_idx)
         train_plot_loss.append(np.mean(training_loss[-check_err_frequency:]))
     if (batch_idx+1)%validate_frequency==0:
@@ -133,14 +188,11 @@ for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
 
         for validate_batch_idx in xrange(validate_batches):
             data_r,data_1,data_2,data_label=my_data_manager.get_triplet_ranked_instance('validate',batch_size,method,dual=False)
-            prediction,loss=my_network.validate(data_r,data_1,data_2,data_label,learning_rate)
-            reshape_prediction = prediction[:, 0]
-            Total_label_val = np.append(Total_label_val, data_label)
-            Total_pre_val = np.append(Total_pre_val, reshape_prediction)
-            NMI = sklearn.metrics.normalized_mutual_info_score(Total_label_val, Total_pre_val)
+            loss=my_network.validate(data_r,data_1,data_2,data_label,learning_rate)[0]
+
             validate_loss.append(loss)
 
-            sys.stdout.write('Validation: batch_idx=%d/%d, loss=%.4f, avg_loss=%.4f \r'%(validate_batch_idx+1, validate_batches, loss, np.mean(validate_loss)))
+            sys.stdout.write('Validation: batch_idx=%d/%d, loss=%.6f, avg_loss=%.6f \r'%(validate_batch_idx+1, validate_batches, loss, np.mean(validate_loss)))
         if np.mean(validate_loss)<validate_min_error:
             validate_min_error=np.mean(validate_loss)
             validate_best_pt=batch_idx+1
@@ -149,14 +201,15 @@ for batch_idx in xrange(begin_batch_idx,begin_batch_idx+batches):
 
         else:
             count +=1
-            if count==3:
+            if count==20:
                 learning_rate = learning_rate/2
                 count = 0
                 if learning_rate==learning_rate_temp/256:
-                    learning_rate = learning_rate*256
+                    learning_rate = learning_rate*2
                     learning_rate_temp = learning_rate
 
         print('')
+
 
 print('Best validated checkpoint = %d'%validate_best_pt)
 plt.plot(batch_list[4:],train_plot_loss[4:])
@@ -164,3 +217,4 @@ plt.plot(batch_list[4:],train_plot_loss[4:])
 plt.title("learning curve")
 plt.show()
 my_network.train_validate_test_end()
+

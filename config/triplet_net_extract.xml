@@ -1,10 +1,7 @@
 <hyper_params>
     <loader>
         <param name="path" type="str">./data/MNIST</param>
-        <param name="train_img" type="str">train-images.idx3-ubyte</param>
-        <param name="train_lbl" type="str">train-labels.idx1-ubyte</param>
-        <param name="test_img" type="str">t10k-images.idx3-ubyte</param>
-        <param name="test_lbl" type="str">t10k-labels.idx1-ubyte</param>
+
     </loader>
     <data_manager>
         <param name="class_num" type="int">1000</param>
@@ -15,15 +12,15 @@
     <network>
         <param name="name" type="str">triplet1</param>
         <param name="channel" type="int">3</param>
-        <param name="height" type="int">28</param>
-        <param name="width" type="int">28</param>
-        <param name="batch_size" type="int">20</param>
+        <param name="height" type="int">32</param>
+        <param name="width" type="int">32</param>
+        <param name="batch_size" type="int">32</param>
         <param name="filter_height" type="list_int">5,3,3</param>
         <param name="filter_width" type="list_int">5,3,3</param>
         <param name="filter_num" type="list_int">64,64,64</param>
         <param name="pool_height" type="list_int">2,2,1</param>
         <param name="pool_width" type="list_int">2,2,1</param>
-        <param name="local_fc_neuron_num" type="list_int">200,50</param>
+        <param name="local_fc_neuron_num" type="list_int">128,32</param>
         <param name="loss_type" type="str">mlp</param>
         <param name="max_gradient_norm" type="float">0.5</param>
         <update_policy>
@@ -37,10 +34,10 @@
             <param name="beta1" type="float">0.9</param>
             <param name="beta2" type="float">0.999</param>
         </update_policy>
-        <param name="global_fc_neuron_num" type="list_int">50</param>
+        <param name="global_fc_neuron_num" type="list_int">64,32</param>
     </network>
     <feature_extraction_params>
-        <param name="batches" type="int">200</param>
-        <param name="model2load" type="str">model_saved/triplet1_85000.ckpt</param>
+        <param name="batches" type="int">60</param>
+        <param name="model2load" type="str">/home/eric/EPFL/semester_project/tripletnet/model_saved/triplet1_21000.ckpt</param>
     </feature_extraction_params>
 </hyper_params>
